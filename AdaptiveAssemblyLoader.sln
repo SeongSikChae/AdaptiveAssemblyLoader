@@ -13,6 +13,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPlugin2", "TestPlugin2\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdaptiveAssemblyLoaderTestProject", "AdaptiveAssemblyLoaderTestProject\AdaptiveAssemblyLoaderTestProject.csproj", "{8AAC3F72-3E79-45F7-8477-7E22C7D4E60C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "솔루션 항목", "솔루션 항목", "{323BC28F-1A55-4454-AAB9-E15EF2BB7509}"
+	ProjectSection(SolutionItems) = preProject
+		ReadMe.md = ReadMe.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
