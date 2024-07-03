@@ -29,6 +29,12 @@ namespace System.Runtime.Loader.Tests
                 manager.Load();
                 manager.Unload();
             }
+
+            using (PluginManager manager = new PluginManager())
+            {
+                manager.Load();
+                manager.Unload();
+            }
         }
     }
 
@@ -64,6 +70,29 @@ namespace System.Runtime.Loader.Tests
                     {
                         plugins?.Add(plugin);
                         plugin.Load();
+                    }
+                }
+            }
+
+            if (adaptiveAssemblyLoader is not null)
+            {
+                Type pluginType = typeof(IPlugin);
+                List<Assembly> list = adaptiveAssemblyLoader.GetAssemblies().ToList();
+                foreach (Assembly assembly in list)
+                {
+                    foreach (Type type in assembly.GetTypes())
+                    {
+                        Type[] interfaceTypes = type.GetInterfaces();
+                        if (interfaceTypes.Contains(pluginType))
+                        {
+                            IPlugin? plugin = Activator.CreateInstance(type) as IPlugin;
+                            if (plugin is not null)
+                            {
+                                plugins?.Add(plugin);
+                                plugin.Load();
+                            }
+                        }
+                            
                     }
                 }
             }

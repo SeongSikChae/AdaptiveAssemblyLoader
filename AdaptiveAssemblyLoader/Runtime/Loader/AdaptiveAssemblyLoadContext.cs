@@ -21,5 +21,11 @@
                 return LoadFromAssemblyPath(dependencyAssemblyPath);
             return null;
         }
+
+        public IEnumerable<Assembly> GetAssemblies()
+        {
+            foreach(string dependencyAssemblyPath in resolver.ResolveAssemblyToPath())
+                yield return LoadFromAssemblyPath(dependencyAssemblyPath);
+        }
     }
 }

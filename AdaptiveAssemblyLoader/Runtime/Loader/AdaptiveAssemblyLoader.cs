@@ -6,26 +6,24 @@
     {
         public AdaptiveAssemblyLoader(string dependencyAssembliesPath)
         {
-            adaptiveAssemblyLoadContext = new AdaptiveAssemblyLoadContext(dependencyAssembliesPath);
-            weakReference = new WeakReference(adaptiveAssemblyLoadContext);
+            weakReference = new WeakReference<AdaptiveAssemblyLoadContext?>(new AdaptiveAssemblyLoadContext(dependencyAssembliesPath));
         }
 
-        private AdaptiveAssemblyLoadContext? adaptiveAssemblyLoadContext;
-        private readonly WeakReference weakReference;
+        private WeakReference<AdaptiveAssemblyLoadContext?> weakReference;
         private bool disposedValue;
 
         public IEnumerable<Assembly> GetAssemblies()
         {
-            if (disposedValue || adaptiveAssemblyLoadContext == null)
-                throw new ObjectDisposedException(nameof(adaptiveAssemblyLoadContext));
-            return adaptiveAssemblyLoadContext.Assemblies;
+            if (disposedValue || !weakReference.TryGetTarget(out AdaptiveAssemblyLoadContext? context))
+                throw new ObjectDisposedException(nameof(context));
+            return context.GetAssemblies();
         }
 
         public Assembly? LoadAssembly(AssemblyName assemblyName)
         {
-            if (disposedValue || adaptiveAssemblyLoadContext == null)
-                throw new ObjectDisposedException(nameof(adaptiveAssemblyLoadContext));
-            return adaptiveAssemblyLoadContext.LoadFromAssemblyName(assemblyName);
+            if (disposedValue || !weakReference.TryGetTarget(out AdaptiveAssemblyLoadContext? context))
+                throw new ObjectDisposedException(nameof(context));
+            return context.LoadFromAssemblyName(assemblyName);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -34,13 +32,13 @@
             {
                 if (disposing)
                 {
-                    adaptiveAssemblyLoadContext?.Unload();
-                    adaptiveAssemblyLoadContext = null;
-                    while (weakReference.IsAlive)
+                    if (weakReference.TryGetTarget(out AdaptiveAssemblyLoadContext? context))
                     {
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
+                        context.Unload();
+                        weakReference.SetTarget(null);
                     }
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
                 }
 
                 disposedValue = true;
