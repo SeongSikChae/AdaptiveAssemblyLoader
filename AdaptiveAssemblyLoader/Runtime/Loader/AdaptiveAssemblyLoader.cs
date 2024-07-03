@@ -11,8 +11,15 @@
         }
 
         private AdaptiveAssemblyLoadContext? adaptiveAssemblyLoadContext;
-        private WeakReference weakReference;
+        private readonly WeakReference weakReference;
         private bool disposedValue;
+
+        public IEnumerable<Assembly> GetAssemblies()
+        {
+            if (disposedValue || adaptiveAssemblyLoadContext == null)
+                throw new ObjectDisposedException(nameof(adaptiveAssemblyLoadContext));
+            return adaptiveAssemblyLoadContext.Assemblies;
+        }
 
         public Assembly? LoadAssembly(AssemblyName assemblyName)
         {
@@ -27,8 +34,7 @@
             {
                 if (disposing)
                 {
-                    if (adaptiveAssemblyLoadContext != null)
-                        adaptiveAssemblyLoadContext.Unload();
+                    adaptiveAssemblyLoadContext?.Unload();
                     adaptiveAssemblyLoadContext = null;
                     while (weakReference.IsAlive)
                     {
